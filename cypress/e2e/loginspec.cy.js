@@ -12,7 +12,7 @@ describe('Orange HRM - Login', () => {
 
   beforeEach(function () {
     cy.fixture('userData.json').as('users');
-    cy.visit('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login');
+    cy.visit('/auth/login');
   });
 
   it('Login - success', function () {
