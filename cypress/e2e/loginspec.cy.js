@@ -1,36 +1,42 @@
 describe('Orange HRM - Login', () => {
   const s = {
-    usernameFld: "input[name='username']",
-    passwordFld: "input[name='password']",
-    loginButton: "button[type='submit']",
-    topBarTitle: ".oxd-topbar-header-breadcrumb .oxd-text",
-    invalidAlertText: ".oxd-alert-content .oxd-text", // ou ".oxd-alert-content-text"
+    usernameFld: 'input[name="username"]',
+    passwordFld: 'input[name="password"]',
+    loginButton: 'button[type="submit"]',
+
+    dashboardTitle: 'h6.oxd-text.oxd-text--h6.oxd-topbar-header-breadcrumb-module',
+
+    invalidAlertText: '.oxd-alert.oxd-alert--error'
+
   };
 
-  beforeEach(() => {
+  beforeEach(function () {
+    cy.fixture('userData.json').as('users');
     cy.visit('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login');
   });
 
-  it('Login - success', () => {
-    cy.get(s.usernameFld).type('Admin');
-    cy.get(s.passwordFld).type('admin123');
+  it('Login - success', function () {
+    const { userSuccess } = this.users;
+
+    cy.get(s.usernameFld).type(userSuccess.username);
+    cy.get(s.passwordFld).type(userSuccess.password);
     cy.get(s.loginButton).click();
 
-    cy.location('pathname', { timeout: 10000 })
+    cy.location('pathname', { timeout: 20000 })
       .should('eq', '/web/index.php/dashboard/index');
 
-    cy.get(s.topBarTitle).should('contain', 'Dashboard');
+    cy.get(s.dashboardTitle, { timeout: 20000 })
+      .should('contain.text', 'Dashboard');
   });
 
-  it('Login - fail', () => {
-    cy.get(s.usernameFld).type('Test');
-    cy.get(s.passwordFld).type('Test');
+  it('Login - fail', function () {
+    const { userFail } = this.users;
+
+    cy.get(s.usernameFld).type(userFail.username);
+    cy.get(s.passwordFld).type(userFail.password);
     cy.get(s.loginButton).click();
 
-    // faz a asserção para evitar timeout e garantir o texto do erro
-    cy.get('.oxd-alert-content', { timeout: 10000 })
+    cy.get(s.invalidAlertText, { timeout: 10000 })
       .should('contain', 'Invalid credentials');
-    // alternativamente:
-    // cy.get(s.invalidAlertText).should('contain', 'Invalid credentials');
   });
 });
